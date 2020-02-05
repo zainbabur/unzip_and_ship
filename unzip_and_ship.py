@@ -32,15 +32,19 @@ projectList = projects['Project Code'].tolist()
 final_df = pd.DataFrame(Columns=['Project No.', 'Project Name', 'Client Name','Supplier Name', 'Shipment No.','Bill Payment Percentage','Status'])
 
 for number in projectList:
-    #Deleting the directory previously made to ensure latest data is saved
-    dirpath = dest_path+str(number)
-    if os.path.exists(dirpath):
-        shutil.rmtree(dirpath)
-    
-    #finding latest project zip file and unzipping it 
-    latest_file = get_latest_file(downloads_path+str(number)+'.zip')
-    shutil.unpack_archive(latest_file, dest_path+str(number), 'zip')
+    try: #if the files are in .zip format
+        #Deleting the directory previously made to ensure latest data is saved
+        dirpath = dest_path+str(number)
+        if os.path.exists(dirpath):
+            shutil.rmtree(dirpath)
 
+        #finding latest project zip file and unzipping it 
+        latest_file = get_latest_file(downloads_path+str(number)+'_Details_*.zip')
+        shutil.unpack_archive(latest_file, dest_path+str(number), 'zip')
+    except: #if the file is a single excel file
+        latest_file = get_latest_file(downloads_path+str(number)+'_Details_*.xls')
+        shutil.copyfile(latest_file, dest_path+str(number)+'\\'+str(number)+'.xls')
+        
     #Making a list of files present in the archive we unzipped
     list_of_files = glob.glob(dest_path+str(number)+'\\*.xls')
     #Making an empty dataframe
